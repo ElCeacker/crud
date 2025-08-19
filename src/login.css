@@ -1,0 +1,173 @@
+:root{
+  --bg: #0b1020;
+  --card: #0f152b;
+  --muted: #8b95b5;
+  --text: #e8ecff;
+  --primary: #6c8bff;
+  --primary-strong: #5877ff;
+  --danger: #ff6b6b;
+  --success: #2ecc71;
+  --input: #151c39;
+  --ring: 0 0 0 3px rgba(108,139,255,.35);
+  --radius: 16px;
+  --shadow: 0 10px 30px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.04) inset;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color: var(--text);
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(108,139,255,.15), transparent 60%),
+    radial-gradient(1000px 500px at -10% 100%, rgba(46,204,113,.12), transparent 55%),
+    var(--bg);
+}
+
+.login-page {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 40px 16px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: linear-gradient(180deg, rgba(255,255,255,.04), transparent 30%) , var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px;
+  border: 1px solid rgba(255,255,255,.06);
+  backdrop-filter: blur(8px);
+  animation: floatIn .5s ease both;
+}
+
+@keyframes floatIn {
+  from { opacity: 0; transform: translateY(8px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.brand {
+  display: grid;
+  gap: 4px;
+  place-items: center;
+  margin-bottom: 10px;
+}
+.logo {
+  width: 54px; height: 54px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(60% 60% at 30% 30%, rgba(108,139,255,.35), transparent), var(--input);
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: inset 0 0 40px rgba(108,139,255,.12), 0 8px 20px rgba(0,0,0,.25);
+  margin-bottom: 6px;
+}
+.title { margin: 0; font-size: 22px; letter-spacing: .2px; }
+.subtitle { margin: 0; color: var(--muted); font-size: 14px; }
+
+.form { display: grid; gap: 14px; margin-top: 14px; }
+
+.field { display: grid; gap: 6px; }
+.field.has-error input { border-color: rgba(255,107,107,.7); }
+label { font-size: 13px; color: #cdd5ff; }
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  color: var(--text);
+  background: var(--input);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 12px;
+  outline: none;
+  transition: box-shadow .2s, border-color .2s, transform .04s;
+}
+input::placeholder { color: rgba(235,240,255,.45); }
+input:focus {
+  border-color: rgba(108,139,255,.7);
+  box-shadow: var(--ring);
+}
+
+.password-wrapper {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+.ghost-btn {
+  height: 36px; width: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.02);
+  cursor: pointer;
+  margin-left: 6px;
+  transition: transform .06s ease, background .15s ease, border-color .2s;
+}
+.ghost-btn:hover { background: rgba(255,255,255,.06); }
+.ghost-btn:active { transform: scale(.98); }
+
+.error {
+  color: var(--danger);
+  font-size: 12px;
+}
+
+.primary-btn {
+  height: 46px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(120deg, var(--primary), var(--primary-strong));
+  color: white;
+  font-weight: 600;
+  letter-spacing: .2px;
+  cursor: pointer;
+  transition: transform .06s ease, filter .15s ease, box-shadow .2s;
+  box-shadow: 0 10px 24px rgba(108,139,255,.35);
+}
+.primary-btn:hover { filter: brightness(1.05); }
+.primary-btn:active { transform: translateY(1px); }
+.primary-btn[disabled] {
+  filter: saturate(.6) brightness(.9);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.server-error, .success {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  border: 1px solid transparent;
+}
+.server-error {
+  background: rgba(255, 107, 107, .15);
+  border-color: rgba(255, 107, 107, .35);
+  color: #ffd1d1;
+}
+.success {
+  background: rgba(46, 204, 113, .15);
+  border-color: rgba(46, 204, 113, .35);
+  color: #d5ffe6;
+}
+
+.meta {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 20px;
+  color: rgba(235,240,255,.6);
+  font-size: 12px;
+}
+
+/* Responsive */
+@media (max-width: 420px) {
+  .login-card { padding: 22px; }
+}
