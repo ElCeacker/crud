@@ -1,5 +1,7 @@
 import React, { useState, useId } from "react";
 import "./login.css";
+ // import Register from "./Register";
+import { Link } from "react-router-dom";
 
 export default function Login({ onLogin }) {
   const emailId = useId();
@@ -149,7 +151,7 @@ export default function Login({ onLogin }) {
         </form>
 
         <p className="meta">
-          ¿No tienes cuenta? <a className="link" href="#" onClick={(e) => e.preventDefault()}>Regístrate</a>
+          ¿No tienes cuenta? <Link className="link" to="/register">Regístrate</Link>
         </p>
       </div>
     </div>

@@ -171,3 +171,22 @@ input:focus {
 @media (max-width: 420px) {
   .login-card { padding: 22px; }
 }
+
+.register-page {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 40px 16px;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 420px;
+  background: linear-gradient(180deg, rgba(255,255,255,.04), transparent 30%) , var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px;
+  border: 1px solid rgba(255,255,255,.06);
+  backdrop-filter: blur(8px);
+  animation: floatIn .5s ease both;
+}
