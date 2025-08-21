@@ -1,6 +1,5 @@
 import React, { useState, useId } from "react";
 import "./login.css";
- // import Register from "./Register";
 import { Link } from "react-router-dom";
 
 export default function Login({ onLogin }) {
@@ -9,7 +8,7 @@ export default function Login({ onLogin }) {
   const [form, setForm] = useState({ email: "", password: "", remember: false });
   const [showPass, setShowPass] = useState(false);
   const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState("idle"); // idle | loading | success | error
+  const [status, setStatus] = useState("idle");
   const [serverError, setServerError] = useState("");
 
   const validate = (next = form) => {
@@ -43,10 +42,10 @@ export default function Login({ onLogin }) {
 
     try {
         setStatus("loading");
-        const res = await fetch("http://localhost:8080/api/auth/login", {
+        const res = await fetch("http://localhost:8081/api/usuarios/logear", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, password: form.password }),
+        body: JSON.stringify({ correo: form.email, password: form.password }),
     });
 
     if (!res.ok) throw new Error("Credenciales incorrectas");

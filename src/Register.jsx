@@ -11,7 +11,7 @@ export default function Register({ onRegister }) {
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
   const [showPass, setShowPass] = useState(false);
   const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState("idle"); // idle | loading | success | error
+  const [status, setStatus] = useState("idle");
   const [serverError, setServerError] = useState("");
 
   const validate = (next = form) => {
@@ -49,17 +49,16 @@ export default function Register({ onRegister }) {
 
     try {
       setStatus("loading");
-      const res = await fetch("http://localhost:8080/api/auth/register", {
+      const res = await fetch("http://localhost:8080/api/usuarios/registrar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          password: form.password,
+           nombreCompleto: form.name, correo: form.email, password: form.password,
         }),
+        
       });
-
-      if (!res.ok) throw new Error("Error al registrar usuario.");
+      
+      if (!res.ok) throw new Error("Este correo ya está en uso.");
       const data = await res.json();
 
       setStatus("success");
@@ -70,7 +69,8 @@ export default function Register({ onRegister }) {
     } finally {
       setTimeout(() => setStatus((s) => (s === "success" ? "success" : "idle")), 800);
     }
-  };
+  }
+
 
   return (
     <div className="register-page">
@@ -149,7 +149,6 @@ export default function Register({ onRegister }) {
             {errors.confirm && <span className="error">{errors.confirm}</span>}
           </div>
 
-          {/* Submit */}
           <button
             className="primary-btn"
             type="submit"
