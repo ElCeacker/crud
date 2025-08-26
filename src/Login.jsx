@@ -42,10 +42,10 @@ export default function Login({ onLogin }) {
 
     try {
         setStatus("loading");
-        const res = await fetch("http://localhost:8081/api/usuarios/logear", {
+        const res = await fetch("http://localhost:8081/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ correo: form.email, password: form.password }),
+        body: JSON.stringify({ email: form.email, password: form.password }),
     });
 
     if (!res.ok) throw new Error("Credenciales incorrectas");

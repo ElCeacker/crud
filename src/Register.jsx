@@ -49,11 +49,11 @@ export default function Register({ onRegister }) {
 
     try {
       setStatus("loading");
-      const res = await fetch("http://localhost:8080/api/usuarios/registrar", {
+      const res = await fetch("http://localhost:8081/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-           nombreCompleto: form.name, correo: form.email, password: form.password,
+           nombreCompleto: form.name, email: form.email, password: form.password,
         }),
         
       });
