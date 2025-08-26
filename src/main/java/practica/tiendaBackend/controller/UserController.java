@@ -1,12 +1,12 @@
 package practica.tiendaBackend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import practica.tiendaBackend.entity.Usuarios;
-import practica.tiendaBackend.repository.UsuarioRepositorio;
+import practica.tiendaBackend.entity.Users;
+import practica.tiendaBackend.repository.UserRepository;
 import org.springframework.http.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import practica.tiendaBackend.service.ServicioUsuario;
+import practica.tiendaBackend.service.UserService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,60 +14,60 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/usuarios")
+@RequestMapping("/api/users")
 @CrossOrigin(origins = "http://localhost:3000")
-public class UsuarioControlador {
-    private final ServicioUsuario servicioUsuario;
+public class UserController {
+    private final UserService UserService;
 
-    private final UsuarioRepositorio usuarioRepositorio;
+    private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public UsuarioControlador(ServicioUsuario servicioUsuario, UsuarioRepositorio usuarioRepositorio) {
-        this.servicioUsuario = servicioUsuario;
-        this.usuarioRepositorio = usuarioRepositorio;
+    public UserController(UserService UserService, UserRepository userRepository) {
+        this.UserService = UserService;
+        this.userRepository = userRepository;
     }
 
     @Autowired
-    private ServicioUsuario usuarioService;
+    private UserService userService;
 
-    @PostMapping("/registrar")
-    public ResponseEntity<?> registrar(@RequestBody Usuarios usuario) {
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody Users user) {
 
-        Optional<Usuarios> usuarioExistente = usuarioRepositorio.findByCorreo(usuario.getCorreo());
+        Optional<Users> existingUser = userRepository.findByEmail(user.getEmail());
 
-        if (usuarioExistente.isPresent()) {
+        if (existingUser.isPresent()) {
             // El correo ya existe en la base de datos
             return ResponseEntity
                     .badRequest()
                     .body("El correo ya está en uso");
         }
-        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         // Guardar nuevo usuario
-        Usuarios nuevoUsuario = usuarioRepositorio.save(usuario);
+        Users newUser = userRepository.save(user);
 
-        return ResponseEntity.ok(nuevoUsuario);
+        return ResponseEntity.ok(newUser);
     }
 
     // Listar usuarios
     @GetMapping
-    public List<Usuarios> listar() {
-        return usuarioRepositorio.findAll();
+    public List<Users> list() {
+        return userRepository.findAll();
     }
 
     // Login
-    @PostMapping("/logear")
-    public ResponseEntity<?> login(@RequestBody Usuarios usuario) {
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Users user) {
         try {
-            boolean valido = servicioUsuario.login(usuario.getCorreo(), usuario.getPassword());
+            boolean valid = UserService.login(user.getEmail(), user.getPassword());
 
-            if (!valido) {
+            if (!valid) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("error", "Credenciales inválidas"));
             }
 
             Map<String, Object> response = new HashMap<>();
-            response.put("correo", usuario.getCorreo());
+            response.put("correo", user.getEmail());
             response.put("mensaje", "Login exitoso");
 
             return ResponseEntity.ok(response);

@@ -5,16 +5,15 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Usuarios {
+public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nombreCompleto;
+    private String allName;
     @Column(unique = true, nullable = false)
-    private String correo;
-    @Column(name = "contrasena")
+    private String email;
     private String password;
     private String rol;
 
@@ -27,20 +26,20 @@ public class Usuarios {
         this.id = id;
     }
 
-    public String getNombreCompleto() {
-        return nombreCompleto;
+    public String getAllName() {
+        return allName;
     }
 
-    public void setNombreCompleto(String nombreCompleto) {
-        this.nombreCompleto = nombreCompleto;
+    public void setAllName(String allName) {
+        this.allName = allName;
     }
 
-    public String getCorreo() {
-        return correo;
+    public String getEmail() {
+        return email;
     }
 
-    public void setCorreo(String correo) {
-        this.correo = correo;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
