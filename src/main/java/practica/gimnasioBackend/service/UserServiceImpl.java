@@ -1,10 +1,12 @@
-package practica.tiendaBackend.service;
+package practica.gimnasioBackend.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import practica.tiendaBackend.entity.Users;
-import practica.tiendaBackend.repository.UserRepository;
+import practica.gimnasioBackend.entity.Rol;
+import practica.gimnasioBackend.entity.Users;
+import practica.gimnasioBackend.repository.RoleRepository;
+import practica.gimnasioBackend.repository.UserRepository;
 
 import java.util.Optional;
 
@@ -16,11 +18,15 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RoleRepository roleRepository;
 
-    public Users registrarUsuario(Users user) {
+    public Users register(Users user) {
         // Encriptar la contraseña antes de guardarla
         String encriptPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encriptPassword);
+
+
 
         return userRepository.save(user);
     }

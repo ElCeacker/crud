@@ -42,7 +42,7 @@ public class UserController {
                     .body("El correo ya está en uso");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
+        user.setRol("User");
         // Guardar nuevo usuario
         Users newUser = userRepository.save(user);
 
