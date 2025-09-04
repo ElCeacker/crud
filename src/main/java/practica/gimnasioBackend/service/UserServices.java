@@ -1,4 +1,10 @@
 package practica.gimnasioBackend.service;
 
-public interface UserServiceIMPL {
+import org.springframework.http.ResponseEntity;
+import practica.gimnasioBackend.entity.Users;
+
+public interface UserServices {
+    ResponseEntity<?> register(Users user);
+
+    boolean login(String email, String password);
 }

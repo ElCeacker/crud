@@ -1,15 +1,14 @@
-package practica.tiendaBackend.controller;
+package practica.gimnasioBackend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import practica.tiendaBackend.entity.Users;
-import practica.tiendaBackend.repository.UserRepository;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import practica.tiendaBackend.service.UserService;
+import practica.gimnasioBackend.entity.Users;
+import practica.gimnasioBackend.service.UserServices;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -17,49 +16,37 @@ import java.util.Optional;
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
-    private final UserService UserService;
+    private final UserServices UserServices;
 
-    private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public UserController(UserService UserService, UserRepository userRepository) {
-        this.UserService = UserService;
-        this.userRepository = userRepository;
+    @Autowired
+    public UserController( UserServices userServices) {
+        UserServices = userServices;
     }
 
-    @Autowired
-    private UserService userService;
+
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Users user) {
+        return UserServices.register(user);
+    }
 
-        Optional<Users> existingUser = userRepository.findByEmail(user.getEmail());
-
+    public static ResponseEntity<String> getStringResponseEntity(Optional<Users> existingUser) {
         if (existingUser.isPresent()) {
             // El correo ya existe en la base de datos
             return ResponseEntity
                     .badRequest()
                     .body("El correo ya está en uso");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRol("User");
-        // Guardar nuevo usuario
-        Users newUser = userRepository.save(user);
-
-        return ResponseEntity.ok(newUser);
-    }
-
-    // Listar usuarios
-    @GetMapping
-    public List<Users> list() {
-        return userRepository.findAll();
+        return null;
     }
 
     // Login
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Users user) {
         try {
-            boolean valid = UserService.login(user.getEmail(), user.getPassword());
+            boolean valid = UserServices.login(user.getEmail(), user.getPassword());
 
             if (!valid) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

@@ -1,7 +1,7 @@
-package practica.tiendaBackend.repository;
+package practica.gimnasioBackend.repository;
 
 import org.springframework.stereotype.Repository;
-import practica.tiendaBackend.entity.Users;
+import practica.gimnasioBackend.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

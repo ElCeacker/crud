@@ -1,6 +1,7 @@
 package practica.gimnasioBackend.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import practica.gimnasioBackend.entity.Rol;
@@ -10,29 +11,54 @@ import practica.gimnasioBackend.repository.UserRepository;
 
 import java.util.Optional;
 
+import static practica.gimnasioBackend.controller.UserController.getStringResponseEntity;
+
 @Service
-public class UserService {
+public class UserServiceImpl implements UserServices {
+
+    private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final RoleRepository roleRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
+    }
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private RoleRepository roleRepository;
+    @Override
+    public ResponseEntity<?> register(Users user) {
 
-    public Users register(Users user) {
-        // Encriptar la contraseña antes de guardarla
-        String encriptPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encriptPassword);
+        Optional<Users> existingUser = userRepository.findByEmail(user.getEmail());
 
+        ResponseEntity<String> body = getStringResponseEntity(existingUser);
+        if (body != null) return body;
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
+        user = rolDefault(user);
+
+        // Guardar nuevo usuario
+        Users newUser = userRepository.save(user);
+        return ResponseEntity.ok(newUser);
+    }
+
+    public Users rolDefault(Users user) {
+
+        Rol defaultRole = roleRepository.findByName("USER");
+        if (defaultRole == null) {
+            throw new RuntimeException("Rol USER no existe en la base de datos");
+        }
+
+        user.setRol(defaultRole);
 
         return userRepository.save(user);
     }
 
-
-    public boolean login(String email, String password) {
+@Override
+public boolean login(String email, String password) {
         // Buscar usuario por correo
         Optional<Users> userOpt = userRepository.findByEmail(email);
 

@@ -1,4 +1,4 @@
-package practica.tiendaBackend.dto;
+package practica.gimnasioBackend.dto;
 
 import lombok.Data;
 

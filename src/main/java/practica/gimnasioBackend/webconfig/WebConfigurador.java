@@ -1,4 +1,4 @@
-package practica.tiendaBackend.webconfig;
+package practica.gimnasioBackend.webconfig;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

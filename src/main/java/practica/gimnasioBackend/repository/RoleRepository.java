@@ -1,10 +1,8 @@
 package practica.gimnasioBackend.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import practica.gimnasioBackend.entity.Role;
+import practica.gimnasioBackend.entity.Rol;
 
-import java.util.Optional;
-
-public interface AdminRepository extends JpaRepository<Role, Long> {
-    Optional<Role> findByRol(String rol);
+public interface RoleRepository extends JpaRepository<Rol, Long> {
+    Rol findByName(String name);
 }

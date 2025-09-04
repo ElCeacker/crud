@@ -1,4 +1,4 @@
-package practica.tiendaBackend.encriptacion;
+package practica.gimnasioBackend.encriptacion;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
