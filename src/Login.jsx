@@ -1,8 +1,9 @@
 import React, { useState, useId } from "react";
 import "./login.css";
-import { Link } from "react-router-dom";
+import { data, Link, useNavigate } from "react-router-dom";
 
 export default function Login({ onLogin }) {
+  const navigate = useNavigate();
   const emailId = useId();
   const passId = useId();
   const [form, setForm] = useState({ email: "", password: "", remember: false });
@@ -50,16 +51,31 @@ export default function Login({ onLogin }) {
 
     if (!res.ok) throw new Error("Credenciales incorrectas");
     const data = await res.json();
-
+    
     // Guardar token
     localStorage.setItem("token", data.token);
 
+    // 👇 Aquí imprime lo que devuelve el backend
+    console.log("Respuesta backend:", data);
+    
+      localStorage.setItem("token", data.token || "");
+      localStorage.setItem("user", JSON.stringify({ email: data.email, roles: data.roles || [] }));
+
+      const roles = Array.isArray(data.roles) ? data.roles : [];
+
     setStatus("success");
         onLogin?.({ email: data.email, token: data.token, remember: form.remember });
+      
+    /*if (roles.includes("ADMIN")) {
+      navigate("/admin");
+    }*/
+
     } catch (err) {
     setServerError(err.message);
     setStatus("error");
     }
+   
+
 }
 
 
