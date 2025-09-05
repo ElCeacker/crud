@@ -5,10 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import practica.gimnasioBackend.dto.Login;
+import practica.gimnasioBackend.dto.LoginResponse;
+import practica.gimnasioBackend.entity.Roles;
 import practica.gimnasioBackend.entity.Users;
 import practica.gimnasioBackend.service.UserServices;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,25 +48,29 @@ public class UserController {
 
     // Login
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Users user) {
+    public ResponseEntity<LoginResponse> login(@RequestBody Login req) {
         try {
-            boolean valid = UserServices.login(user.getEmail(), user.getPassword());
+            Users user = UserServices.authenticate(req.getEmail(), req.getPassword());
 
-            if (!valid) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error", "Credenciales inválidas"));
-            }
+            List<String> roleNames = user.getRoles()
+                    .stream()
+                    .map(Roles::getName)     // "ADMIN", "USER"
+                    .toList();
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("correo", user.getEmail());
-            response.put("mensaje", "Login exitoso");
+            LoginResponse resp = new LoginResponse(
+                    user.getEmail(),
+                    roleNames,
+                    "Login exitoso"
+            );
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(resp);
 
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new LoginResponse(null, List.of(), "Credenciales inválidas"));
         } catch (Exception e) {
-            e.printStackTrace(); // 👈 Para ver en consola el error exacto
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error en Login: " + e.getMessage()));
+                    .body(new LoginResponse(null, List.of(), "Error en Login: " + e.getMessage()));
         }
     }
 

@@ -10,7 +10,6 @@ import practica.gimnasioBackend.repository.RoleRepository;
 import practica.gimnasioBackend.repository.UserRepository;
 
 import java.util.Optional;
-import java.util.Set;
 
 import static practica.gimnasioBackend.controller.UserController.getStringResponseEntity;
 
@@ -56,6 +55,18 @@ public class UserServiceImpl implements UserServices {
         user.getRoles().add(defaultRole);
 
         return userRepository.save(user);
+    }
+
+    @Override
+    public Users authenticate(String email, String rawPassword) {
+        Users u = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (!passwordEncoder.matches(rawPassword, u.getPassword())) {
+            throw new RuntimeException("Credenciales inválidas");
+        }
+        // En este punto `u.getRoles()` ya viene cargado por @EntityGraph
+        return u;
     }
 
 @Override
