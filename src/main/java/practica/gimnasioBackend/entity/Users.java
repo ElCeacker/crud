@@ -5,10 +5,14 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Setter
 @Getter
 @Data
 @Entity
+@Table(name = "users")
 public class Users {
 
     @Id
@@ -20,7 +24,12 @@ public class Users {
     private String email;
     private String password;
 
-    @ManyToOne
-    @JoinColumn(name = "rol_id")
-    private Rol rol;
+    @ManyToMany(fetch = FetchType.EAGER) //
+    @JoinTable(
+            name = "users_roles", // tabla intermedia
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "rol_id")
+    )
+    private Set<Roles> roles = new HashSet<>();
+
 }

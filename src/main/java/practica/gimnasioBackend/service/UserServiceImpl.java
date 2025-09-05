@@ -4,12 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import practica.gimnasioBackend.entity.Rol;
+import practica.gimnasioBackend.entity.Roles;
 import practica.gimnasioBackend.entity.Users;
 import practica.gimnasioBackend.repository.RoleRepository;
 import practica.gimnasioBackend.repository.UserRepository;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static practica.gimnasioBackend.controller.UserController.getStringResponseEntity;
 
@@ -47,12 +48,12 @@ public class UserServiceImpl implements UserServices {
 
     public Users rolDefault(Users user) {
 
-        Rol defaultRole = roleRepository.findByName("USER");
+        Roles defaultRole = roleRepository.findByName("USER");
         if (defaultRole == null) {
             throw new RuntimeException("Rol USER no existe en la base de datos");
         }
 
-        user.setRol(defaultRole);
+        user.getRoles().add(defaultRole);
 
         return userRepository.save(user);
     }
