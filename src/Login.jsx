@@ -1,6 +1,6 @@
 import React, { useState, useId } from "react";
 import "./login.css";
-import { data, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login({ onLogin }) {
   const navigate = useNavigate();
@@ -66,9 +66,11 @@ export default function Login({ onLogin }) {
     setStatus("success");
         onLogin?.({ email: data.email, token: data.token, remember: form.remember });
       
-    /*if (roles.includes("ADMIN")) {
+    if (roles.includes("ADMIN")) {
       navigate("/admin");
-    }*/
+    } else {
+      navigate("/user");
+    }
 
     } catch (err) {
     setServerError(err.message);
