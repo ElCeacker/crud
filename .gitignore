@@ -33,3 +33,4 @@ build/
 .vscode/
 
 src/main/resources/db-credentials.txt
+src/main/java/practica/gimnasioBackend/HashOnce.java

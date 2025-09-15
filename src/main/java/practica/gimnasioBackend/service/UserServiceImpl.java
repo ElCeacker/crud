@@ -9,6 +9,7 @@ import practica.gimnasioBackend.entity.Users;
 import practica.gimnasioBackend.repository.RoleRepository;
 import practica.gimnasioBackend.repository.UserRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static practica.gimnasioBackend.controller.UserController.getStringResponseEntity;
@@ -69,18 +70,23 @@ public class UserServiceImpl implements UserServices {
         return u;
     }
 
-@Override
-public boolean login(String email, String password) {
-        // Buscar usuario por correo
-        Optional<Users> userOpt = userRepository.findByEmail(email);
-
-        if (userOpt.isEmpty()) {
-            return false; // No existe el correo
-        }
-
-        Users user = userOpt.get();
-
-        // Comparar la contraseña en texto plano con la encriptada
-        return passwordEncoder.matches(password, user.getPassword());
+    @Override
+    public List<Users> getAllUsers() {
+        return userRepository.findAll();   // 👈 devuelve todos los usuarios
     }
-}
+
+    @Override
+    public boolean login(String email, String password) {
+            // Buscar usuario por correo
+            Optional<Users> userOpt = userRepository.findByEmail(email);
+
+            if (userOpt.isEmpty()) {
+                return false; // No existe el correo
+            }
+
+            Users user = userOpt.get();
+
+            // Comparar la contraseña en texto plano con la encriptada
+            return passwordEncoder.matches(password, user.getPassword());
+        }
+    }
