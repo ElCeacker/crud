@@ -14,16 +14,10 @@ export default function Login({ onLogin }) {
 
   const validate = (next = form) => {
     const e = {};
-    if (!next.email.trim()) {
-      e.email = "El correo es obligatorio.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(next.email)) {
-      e.email = "Formato de correo no válido.";
-    }
-    if (!next.password) {
-      e.password = "La contraseña es obligatoria.";
-    } else if (next.password.length < 6) {
-      e.password = "Mínimo 6 caracteres.";
-    }
+    if (!next.email.trim()) e.email = "El correo es obligatorio.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(next.email)) e.email = "Formato de correo no válido.";
+    if (!next.password) e.password = "La contraseña es obligatoria.";
+    else if (next.password.length < 6) e.password = "Mínimo 6 caracteres.";
     return e;
   };
 
@@ -42,44 +36,48 @@ export default function Login({ onLogin }) {
     if (Object.keys(e).length) return;
 
     try {
-        setStatus("loading");
-        const res = await fetch("http://localhost:8081/api/users/login", {
+      setStatus("loading");
+      const res = await fetch("http://localhost:8081/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: form.email, password: form.password }),
-    });
+      });
 
-    if (!res.ok) throw new Error("Credenciales incorrectas");
-    const data = await res.json();
-    
-    // Guardar token
-    localStorage.setItem("token", data.token);
+      if (!res.ok) throw new Error("Credenciales incorrectas");
 
-    // 👇 Aquí imprime lo que devuelve el backend
-    console.log("Respuesta backend:", data);
-    
+      const data = await res.json();
+
+      // El backend puede devolver 'correo' o 'email'
+      const emailFromApi = data.correo || data.email || form.email;
+      const rolesFromApi = Array.isArray(data.roles) ? data.roles : [];
+
+      // Si no usas JWT, guarda un string vacío o lo que te devuelva tu back
       localStorage.setItem("token", data.token || "");
-      localStorage.setItem("user", JSON.stringify({ email: data.email, roles: data.roles || [] }));
 
-      const roles = Array.isArray(data.roles) ? data.roles : [];
+      // MUY IMPORTANTE: guarda el usuario con al menos el email
+      // (si tu back envía id, añádelo: id: data.id)
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          email: emailFromApi,
+          roles: rolesFromApi,
+          // id: data.id ?? null    // descomenta si el back lo envía
+        })
+      );
 
-    setStatus("success");
-        onLogin?.({ email: data.email, token: data.token, remember: form.remember });
-      
-    if (roles.includes("ADMIN")) {
-      navigate("/admin");
-    } else {
-      navigate("/user");
-    }
+      // callback opcional
+      onLogin?.({ email: emailFromApi, token: data.token || "", remember: form.remember });
 
+      setStatus("success");
+
+      // redirección por rol
+      if (rolesFromApi.includes("ADMIN")) navigate("/admin");
+      else navigate("/user");
     } catch (err) {
-    setServerError(err.message);
-    setStatus("error");
+      setServerError(err.message || "Error en el login");
+      setStatus("error");
     }
-   
-
-}
-
+  };
 
   const isDisabled = status === "loading";
 
@@ -146,12 +144,7 @@ export default function Login({ onLogin }) {
             )}
           </div>
 
-          <button
-            className="primary-btn"
-            type="submit"
-            disabled={isDisabled}
-            aria-busy={status === "loading"}
-          >
+          <button className="primary-btn" type="submit" disabled={isDisabled} aria-busy={status === "loading"}>
             {status === "loading" ? "Accediendo..." : "Entrar"}
           </button>
 
