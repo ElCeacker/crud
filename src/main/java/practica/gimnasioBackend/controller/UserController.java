@@ -8,64 +8,46 @@ import org.springframework.web.bind.annotation.*;
 import practica.gimnasioBackend.dto.Login;
 import practica.gimnasioBackend.dto.LoginResponse;
 import practica.gimnasioBackend.dto.UserResponse;
+import practica.gimnasioBackend.dto.UserUpdateRequest;
 import practica.gimnasioBackend.entity.Roles;
 import practica.gimnasioBackend.entity.Users;
 import practica.gimnasioBackend.service.UserServices;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
-    private final UserServices UserServices;
 
+    private final UserServices userServices;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Autowired
-    public UserController( UserServices userServices) {
-        UserServices = userServices;
+    public UserController(UserServices userServices) {
+        this.userServices = userServices;
     }
-
-
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Users user) {
-        return UserServices.register(user);
+        return userServices.register(user);
     }
 
     public static ResponseEntity<String> getStringResponseEntity(Optional<Users> existingUser) {
         if (existingUser.isPresent()) {
-            // El correo ya existe en la base de datos
-            return ResponseEntity
-                    .badRequest()
-                    .body("El correo ya está en uso");
+            return ResponseEntity.badRequest().body("El correo ya está en uso");
         }
         return null;
     }
 
-    // Login
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody Login req) {
         try {
-            Users user = UserServices.authenticate(req.getEmail(), req.getPassword());
-
-            List<String> roleNames = user.getRoles()
-                    .stream()
-                    .map(Roles::getName)     // "ADMIN", "USER"
-                    .toList();
-
-            LoginResponse resp = new LoginResponse(
-                    user.getEmail(),
-                    roleNames,
-                    "Login exitoso"
-            );
-
+            Users user = userServices.authenticate(req.getEmail(), req.getPassword());
+            List<String> roleNames = user.getRoles().stream().map(Roles::getName).toList();
+            LoginResponse resp = new LoginResponse(user.getEmail(), roleNames, "Login exitoso");
             return ResponseEntity.ok(resp);
-
         } catch (RuntimeException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new LoginResponse(null, List.of(), "Credenciales inválidas"));
@@ -74,18 +56,30 @@ public class UserController {
                     .body(new LoginResponse(null, List.of(), "Error en Login: " + e.getMessage()));
         }
     }
+
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
-        List<UserResponse> out = UserServices.getAllUsers().stream()
-                .map(u -> new UserResponse(
-                        u.getId(),
-                        u.getEmail(),
-                        u.getRoles().stream().map(Roles::getName).toList()
-                ))
-                .toList();
-        return ResponseEntity.ok(out);
+        // usa el método DTO del service (sin passwords)
+        return ResponseEntity.ok(userServices.getAll());
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponse> update(
+            @PathVariable Long id,
+            @RequestBody UserUpdateRequest req,
+            @RequestHeader(name = "X-User-Email", required = false) String currentEmail
+    ) {
+        return ResponseEntity.ok(userServices.update(id, req, currentEmail));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long id,
+            @RequestHeader(name = "X-User-Email", required = false) String currentEmail
+    ) {
+        userServices.deleteUser(id, currentEmail);
+        return ResponseEntity.noContent().build();
+    }
 
 
 }
