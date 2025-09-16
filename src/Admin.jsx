@@ -14,7 +14,6 @@ export default function AdminUsers() {
   const [confirmDel, setConfirmDel] = useState(null);
   const pageSize = 10;
 
-  // Usuario logueado guardado en localStorage por tu login
   const currentUser = (() => {
     try { return JSON.parse(localStorage.getItem("user") || "null"); }
     catch { return null; }
@@ -22,12 +21,11 @@ export default function AdminUsers() {
   const currentId = currentUser?.id ?? null;
   const currentEmail = currentUser?.correo || currentUser?.email || null;
 
-  // Encabezados con token + QUIÉN SOY para que el backend bloquee autodelete
   const authHeaders = () => {
     const token = localStorage.getItem("token") || "";
     const h = { "Content-Type": "application/json" };
     if (token) h.Authorization = `Bearer ${token}`;
-    if (currentEmail) h["X-User-Email"] = currentEmail; // 👈 clave
+    if (currentEmail) h["X-User-Email"] = currentEmail; 
     return h;
   };
 
@@ -56,7 +54,6 @@ export default function AdminUsers() {
       }
     };
     fetchUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filtered = useMemo(() => {
@@ -110,7 +107,7 @@ export default function AdminUsers() {
       const body = {
         email: (form.email || "").trim(),
         name: (form.name || "").trim(),
-        roles: [roleToSend], // backend espera lista
+        roles: [roleToSend],
       };
 
       const res = await fetch(`http://localhost:8081/api/users/${form.id}`, {
@@ -135,7 +132,6 @@ export default function AdminUsers() {
   const deleteUser = async (id) => {
     const u = users.find(x => x.id === id);
 
-    // validar en front
     const isSelf =
       (currentId && id === currentId) ||
       (currentEmail && u?.email === currentEmail);
@@ -149,7 +145,7 @@ export default function AdminUsers() {
     try {
       const res = await fetch(`http://localhost:8081/api/users/${id}`, {
         method: "DELETE",
-        headers: authHeaders(), // 👈 envía X-User-Email al backend
+        headers: authHeaders(), // envía X-User-Email al backend
       });
 
       if (!res.ok) {
@@ -225,7 +221,7 @@ export default function AdminUsers() {
                         <button
                           className="admin-action"
                           onClick={() => openEdit(u)}
-                          disabled={isSelf}                               // 👈 bloqueo edición propia
+                          disabled={isSelf}
                           title={isSelf ? "No puedes editarte" : ""}
                         >
                           Editar
@@ -233,7 +229,7 @@ export default function AdminUsers() {
                         <button
                           className="admin-action danger"
                           onClick={() => setConfirmDel(u)}
-                          disabled={isSelf}                               // 👈 bloqueo borrado propio
+                          disabled={isSelf}
                           title={isSelf ? "No puedes eliminarte" : ""}
                         >
                           Eliminar
