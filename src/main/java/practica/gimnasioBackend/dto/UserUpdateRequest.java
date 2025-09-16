@@ -4,10 +4,10 @@ import lombok.Data;
 
 @Data
 public class UserUpdateRequest {
-    private String id;     // opcional si lo recibes en body
+    private String id;
     private String email;
-    private String name;   // o "nombre"
-    private String role;   // "USER" o "ADMIN"
+    private String name;
+    private String role;
 
     public UserUpdateRequest() {}
 

@@ -14,21 +14,17 @@ import practica.gimnasioBackend.repository.UserRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 
 import static practica.gimnasioBackend.controller.UserController.getStringResponseEntity;
 
 @Service
 public class UserServiceImpl implements UserServices {
 
-    // (estaban ya en tu clase; los mantengo)
-    private final UserRepository userRepo;        // no lo uso abajo, conservo para compatibilidad
-    private final RoleRepository roleRepo;        // no lo uso abajo, conservo para compatibilidad
+    private final RoleRepository roleRepo;
 
-    private final UserRepository userRepository;  // este es el que estás usando en tu código
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;  // este es el que estás usando en tu código
-
+    private final RoleRepository roleRepository;
     @Autowired
     public UserServiceImpl(
             UserRepository userRepo,
@@ -37,16 +33,11 @@ public class UserServiceImpl implements UserServices {
             PasswordEncoder passwordEncoder,
             RoleRepository roleRepository
     ) {
-        this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.roleRepository = roleRepository;
     }
-
-    /* ==========================
-       REGISTRO / LOGIN (tuyo)
-       ========================== */
 
     @Override
     public ResponseEntity<?> register(Users user) {
@@ -82,28 +73,6 @@ public class UserServiceImpl implements UserServices {
         return u;
     }
 
-    @Override
-    public List<Users> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    @Override
-    public boolean login(String email, String password) {
-        Optional<Users> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isEmpty()) return false;
-        return passwordEncoder.matches(password, userOpt.get().getPassword());
-    }
-
-    @Override
-    public UserResponse update(Long id, UserResponse req, String currentEmailOrNull) {
-        return null;
-    }
-
-    /* =======================================================
-       NUEVO: LISTAR (DTO), ACTUALIZAR y ELIMINAR PARA EL ADMIN
-       ======================================================= */
-
-    /** Lista de usuarios como DTO (sin password) */
     public List<UserResponse> getAll() {
         return userRepository.findAll()
                 .stream()
@@ -111,14 +80,7 @@ public class UserServiceImpl implements UserServices {
                 .toList();
     }
 
-    /**
-     * Actualiza email, nombre y (si no es el propio usuario) el rol.
-     * Usa UserUpdateRequest (id, email, name, role).
-     * currentEmailOrNull llega de cabecera "X-User-Email" o de tu seguridad.
-     */
     public UserResponse update(Long id, UserUpdateRequest req, String currentEmailOrNull) {
-        // si te llega id en el body y quieres validar, puedes comprobarlo:
-        // if (req.id() != null && !req.id().isBlank() && !id.toString().equals(req.id())) { ... }
 
         Users u = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Usuario no encontrado"));
@@ -126,17 +88,14 @@ public class UserServiceImpl implements UserServices {
         boolean isSelf = currentEmailOrNull != null
                 && currentEmailOrNull.equalsIgnoreCase(u.getEmail());
 
-        // email
         if (req.getEmail() != null && !req.getEmail().trim().isEmpty()) {
             u.setEmail(req.getEmail().trim());
         }
 
-        // nombre (si tu campo real es "nombre", usa u.setNombre(...))
         if (req.getName() != null && !req.getName().trim().isEmpty()) {
             u.setAllName(req.getName().trim());
         }
 
-        // rol (solo si NO es el propio usuario)
         if (req.getRole() != null && !isSelf) {
             String roleName = req.getRole().trim().toUpperCase();
             if (!roleName.equals("USER") && !roleName.equals("ADMIN")) {
@@ -155,7 +114,6 @@ public class UserServiceImpl implements UserServices {
         return toResponse(saved);
     }
 
-    /** Eliminar usuario (no puede eliminarse a sí mismo) */
     @Override
     public void deleteUser(Long id, String currentEmail) {
         Users u = userRepository.findById(id)
@@ -166,9 +124,6 @@ public class UserServiceImpl implements UserServices {
         }
         userRepository.delete(u);
     }
-
-
-
 
     private UserResponse toResponse(Users u) {
         List<String> roles = (u.getRoles() == null || u.getRoles().isEmpty())

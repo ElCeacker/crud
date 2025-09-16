@@ -26,7 +26,7 @@ public class Users {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER) //
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles", // tabla intermedia
             joinColumns = @JoinColumn(name = "user_id"),

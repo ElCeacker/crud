@@ -12,12 +12,8 @@ public interface UserServices {
 
     Users authenticate(String email, String rawPassword);
 
-    List<Users> getAllUsers();
-
-    boolean login(String email, String password);
-
-    UserResponse update(Long id, UserResponse req, String currentEmailOrNull);
     List<UserResponse> getAll();
+
     UserResponse update(Long id, UserUpdateRequest req, String currentEmailOrNull);
 
     void deleteUser(Long id, String currentEmail);
